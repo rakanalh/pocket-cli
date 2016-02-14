@@ -12,6 +12,7 @@ from .storage import Storage
 
 class PocketApp:
     DEFAULT_WORDS_PER_MINUTE = 180
+    REDIRECT_URL = 'http://www.google.com'
 
     def __init__(self):
         self._configs = Configs()
@@ -20,6 +21,22 @@ class PocketApp:
         self._pocket = Pocket(
             self._configs.get('consumer_key'),
             self._configs.get('access_token')
+        )
+
+    def configure(self, consumer_key, access_token, words_per_minute):
+        self._configs.set('consumer_key', consumer_key)
+        self._configs.set('access_token', access_token)
+        self._configs.set('words_per_minute', words_per_minute)
+        self._configs.write()
+
+    def get_request_token(self, consumer_key):
+        return self._pocket.get_request_token(
+            consumer_key, self.REDIRECT_URL
+        )
+
+    def get_access_token(self, consumer_key, request_token):
+        return self._pocket.get_access_token(
+            consumer_key, request_token
         )
 
     def add_article(self, url, title=None, tags=None):

@@ -22,14 +22,33 @@ def main():
 @click.command()
 @click.option('--consumer-key', '-k',
               prompt='Please provide your consumer key')
-@click.option('--access-token', '-t',
-              prompt='Please provide your access token')
 @click.option('--words-per-minute', '-wpm',
               type=click.INT,
               prompt='Please prefer your reading speed in words per minute',
               help='Used in calculating reading time for each article')
-def configure():
-    pass
+def configure(consumer_key, words_per_minute):
+    request_token = pocket_app.get_request_token(consumer_key)
+
+    if not request_token:
+        print('Could not obtain request_token')
+        return
+
+    url = 'http://getpocket.com/auth/authorize?request_token={0}' \
+          '&redirect_uri={1}'.format(request_token, 'http://www.google.com')
+
+    print('You will have to authorize the application to access your articles')
+    print('Enter any key once you\'re redirected to google.com')
+    webbrowser.open_new_tab(url)
+    input()
+
+    access_token = pocket_app.get_access_token(consumer_key, request_token)
+
+    if not access_token:
+        print('Could not obtain access token')
+        return
+
+    pocket_app.configure(consumer_key, access_token, words_per_minute)
+    print('The application is ready to use')
 
 
 @click.command(name='add')
