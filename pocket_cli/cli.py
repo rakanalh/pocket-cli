@@ -32,6 +32,21 @@ def configure():
     pass
 
 
+@click.command(name='add')
+@click.option('--url', '-u',
+              help='The URL to be added')
+@click.option('--title', '-t',
+              help='The article\'s title')
+@click.option('--tags', '-g', multiple=True,
+              help='Tags to be associated. '
+                   'Can be multiple tags --tags=tag1, --tags=tag2')
+def add_article(url, title, tags):
+    response = pocket_app.add_article(url, title, tags)
+    if response['status'] == 1:
+        pocket_app.fetch_articles(False)
+        print('URL has been added')
+
+
 @click.command(name='list')
 @click.option('--limit', '-l', default=10,
               help='Number of items to list')
@@ -109,11 +124,19 @@ def fetch():
     pocket_app.fetch_articles(True)
 
 
+@click.command(name='archive')
+@click.argument('article_id')
+def archive_article(article_id):
+    pocket_app.archive_article(int(article_id))
+
+
 main.add_command(configure)
+main.add_command(add_article)
 main.add_command(list_articles)
 main.add_command(random_article)
 main.add_command(fetch)
 main.add_command(read)
+main.add_command(archive_article)
 
 if __name__ == '__main__':
     main()

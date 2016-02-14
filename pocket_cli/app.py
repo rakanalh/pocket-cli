@@ -22,6 +22,12 @@ class PocketApp:
             self._configs.get('access_token')
         )
 
+    def add_article(self, url, title=None, tags=None):
+        if isinstance(tags, tuple):
+            tags = ','.join(list(tags))
+
+        return self._pocket.add(url, title, tags)
+
     def get_articles(self, limit=None, order=None):
         if self._storage.is_empty():
             self.fetch_articles(True)
