@@ -1,20 +1,12 @@
-
-import csv
-import math
-import os
 import random
-import shutil
 import subprocess
 import sys
 import webbrowser
-from operator import itemgetter
 
 import click
-import pocket
-from progress.spinner import Spinner
 
-from app import PocketApp
-from utils import format_article
+from .app import PocketApp
+from .utils import format_article
 
 
 pocket_app = PocketApp()

@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='pocket-time',
+    name='pocket-cli',
     version='0.1',
     packages=find_packages(),
     include_package_data=True,
@@ -10,8 +10,9 @@ setup(
         'requests==2.9.1',
         'pocket-api'
     ],
-    entry_points='''
-        [console_scripts]
-        pocket-time=cli:main
-    ''',
+    entry_points={
+        'console_scripts': [
+            'pocket-cli=pocket_cli.cli:main'
+        ]
+    },
 )

@@ -6,8 +6,8 @@ from operator import itemgetter
 from pocket import Pocket
 from progress.spinner import Spinner
 
-from config import Configs
-from storage import Storage
+from .config import Configs
+from .storage import Storage
 
 
 class PocketApp:
