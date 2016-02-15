@@ -29,10 +29,12 @@ class PocketApp:
             self._configs.get('access_token')
         )
 
-    def configure(self, consumer_key, access_token, words_per_minute):
+    def configure(self, consumer_key, access_token,
+                  words_per_minute, sort_field):
         self._configs.set('consumer_key', consumer_key)
         self._configs.set('access_token', access_token)
         self._configs.set('words_per_minute', words_per_minute)
+        self._configs.set('sort_field', sort_field)
         self._configs.set('last_fetch', 0)
         self._configs.write()
 
@@ -61,7 +63,14 @@ class PocketApp:
         if self._storage.is_empty():
             self.fetch_articles(True)
 
-        return self._storage.read(limit, order)
+        articles = self._storage.read(limit, order)
+        sort_field = self._configs.get('sort_field')
+        if not sort_field:
+            sort_field = 'reading_time'
+
+        articles = sorted(articles,
+                          key=itemgetter(sort_field))
+        return articles
 
     def archive_article(self, item_id):
         try:
@@ -141,8 +150,12 @@ class PocketApp:
         if spinner:
             spinner.finish()
 
+        sort_field = self._configs.get('sort_field')
+        if not sort_field:
+            sort_field = 'reading_time'
+
         articles_index = sorted(articles_index,
-                                key=itemgetter('reading_time'))
+                                key=itemgetter(sort_field))
         self._storage.write(articles_index)
 
         self._configs.set('last_fetch', self._get_timestamp(datetime.now()))

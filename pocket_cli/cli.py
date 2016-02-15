@@ -23,11 +23,14 @@ def main():
 @click.command()
 @click.option('--consumer-key', '-k',
               prompt='Please provide your consumer key')
+@click.option('--sort_field', '-s',
+              type=click.Choice(['id', 'reading_time']),
+              prompt='Please provide your preferred sort field')
 @click.option('--words-per-minute', '-wpm',
               type=click.INT,
               prompt='Please prefer your reading speed in words per minute',
               help='Used in calculating reading time for each article')
-def configure(consumer_key, words_per_minute):
+def configure(consumer_key, sort_field, words_per_minute):
     request_token = pocket_app.get_request_token(consumer_key)
 
     if not request_token:
@@ -48,7 +51,8 @@ def configure(consumer_key, words_per_minute):
         print('Could not obtain access token')
         return
 
-    pocket_app.configure(consumer_key, access_token, words_per_minute)
+    pocket_app.configure(consumer_key, access_token,
+                         words_per_minute, sort_field)
     print('The application is ready to use')
 
 
