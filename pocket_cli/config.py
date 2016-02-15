@@ -24,6 +24,8 @@ class Configs:
         return value
 
     def set(self, name, value):
+        if not self._config_parser.has_section(self._section_name):
+            self._config_parser.add_section(self._section_name)
         self._config_parser.set(self._section_name, name, str(value))
 
     def write(self):
