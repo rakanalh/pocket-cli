@@ -61,7 +61,7 @@ def configure(consumer_key, words_per_minute):
                    'Can be multiple tags --tags=tag1, --tags=tag2')
 def add_article(url, title, tags):
     response = pocket_app.add_article(url, title, tags)
-    if response['status'] == 1:
+    if response and response['status'] == 1:
         pocket_app.fetch_articles(False)
         print('URL has been added')
 

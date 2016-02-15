@@ -3,7 +3,7 @@ import time
 from datetime import datetime
 from operator import itemgetter
 
-from pocket import Pocket
+from pocket import Pocket, PocketException
 from progress.spinner import Spinner
 
 from .config import Configs
@@ -27,7 +27,10 @@ class PocketApp:
         self._configs.set('consumer_key', consumer_key)
         self._configs.set('access_token', access_token)
         self._configs.set('words_per_minute', words_per_minute)
+        self._configs.set('last_fetch', 0)
         self._configs.write()
+
+        self._storage.clear()
 
     def get_request_token(self, consumer_key):
         return self._pocket.get_request_token(
@@ -43,7 +46,10 @@ class PocketApp:
         if isinstance(tags, tuple):
             tags = ','.join(list(tags))
 
-        return self._pocket.add(url, title, tags)
+        try:
+            return self._pocket.add(url, title, tags)
+        except PocketException as e:
+            return self._check_exception(e)
 
     def get_articles(self, limit=None, order=None):
         if self._storage.is_empty():
@@ -52,7 +58,10 @@ class PocketApp:
         return self._storage.read(limit, order)
 
     def archive_article(self, item_id):
-        self._pocket.archive(int(item_id)).commit()
+        try:
+            self._pocket.archive(int(item_id)).commit()
+        except PocketException as e:
+            return self._check_exception(e)
 
     def find_article(self, item_id):
         index = self._storage.read()
@@ -73,18 +82,24 @@ class PocketApp:
         wpm = self._configs.get('words_per_minute')
         if not wpm:
             wpm = self.DEFAULT_WORDS_PER_MINUTE
+        wpm = int(wpm)
 
         last_fetch = self._configs.get('last_fetch')
 
         offset = 0
         count = 20
         while(True):
-            articles = self._pocket.retrieve(
-                state='unread',
-                count=count,
-                offset=offset,
-                since=last_fetch
-            )
+            try:
+                articles = self._pocket.retrieve(
+                    state='unread',
+                    count=count,
+                    offset=offset,
+                    since=last_fetch
+                )
+            except PocketException as e:
+                spinner.finish()
+                self._check_exception(e)
+                return
 
             if not articles['list']:
                 break
@@ -130,3 +145,11 @@ class PocketApp:
 
     def _get_timestamp(self, date):
         return int(time.mktime(date.timetuple()))
+
+    def _check_exception(self, e):
+        if int(e.error_code) == 136:
+            print('Application is not configured')
+            print('Run `pocket-cli configure` to be able to use this app')
+            return
+        print(e.message)
+        return False

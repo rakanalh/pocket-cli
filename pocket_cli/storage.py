@@ -50,3 +50,7 @@ class Storage:
             index = index[::-1]
 
         return index[0:limit]
+
+    def clear(self):
+        if os.path.exists(self._filename):
+            os.remove(self._filename)
