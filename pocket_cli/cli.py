@@ -6,6 +6,7 @@ import webbrowser
 import click
 
 from .app import PocketApp
+from .exceptions import AppNotConfigured, AppException
 from .utils import format_article
 
 
@@ -73,7 +74,19 @@ def add_article(url, title, tags):
               type=click.Choice(['asc', 'desc']),
               help='Order of items to return')
 def list_articles(limit, order):
-    articles = pocket_app.get_articles(limit, order)
+    try:
+        articles = pocket_app.get_articles(limit, order)
+    except AppNotConfigured:
+        app_not_configured()
+        return
+    except AppException as e:
+        exception_occured(e)
+        return
+
+    if not articles:
+        print('Articles index is empty,'
+              'run pocket-cli fetch to index your articles')
+        return
 
     try:
         pager = subprocess.Popen(['less'],
@@ -140,13 +153,35 @@ def random_article(browser, archive):
 
 @click.command()
 def fetch():
-    pocket_app.fetch_articles(True)
+    try:
+        pocket_app.fetch_articles(True)
+    except AppNotConfigured:
+        app_not_configured()
+    except AppException as e:
+        exception_occured(e)
 
 
 @click.command(name='archive')
 @click.argument('article_id')
 def archive_article(article_id):
-    pocket_app.archive_article(int(article_id))
+    try:
+        pocket_app.archive_article(int(article_id))
+    except AppNotConfigured:
+        app_not_configured()
+    except AppException as e:
+        exception_occured(e)
+
+
+def app_not_configured():
+    print('App is not configured')
+    print('Run `pocket-cli configure` to be able to use the app')
+
+
+def exception_occured(exception):
+    print('An error occured while '
+          'trying to perform requested action: {}'.format(
+              exception.message
+          ))
 
 
 main.add_command(configure)

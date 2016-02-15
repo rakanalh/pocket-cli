@@ -34,6 +34,9 @@ class Storage:
     def read(self, limit=10, order='asc'):
         index = []
 
+        if not os.path.exists(self._filename):
+            return index
+
         row_counter = 0
         with open(self._filename, 'r') as csv_file:
             reader = csv.DictReader(csv_file)

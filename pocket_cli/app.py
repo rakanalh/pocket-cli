@@ -3,10 +3,16 @@ import time
 from datetime import datetime
 from operator import itemgetter
 
-from pocket import Pocket, PocketException
+from pocket import (
+    Pocket,
+    PocketException,
+    PocketAutException
+)
+
 from progress.spinner import Spinner
 
 from .config import Configs
+from .exceptions import AppException, AppNotConfigured
 from .storage import Storage
 
 
@@ -49,7 +55,7 @@ class PocketApp:
         try:
             return self._pocket.add(url, title, tags)
         except PocketException as e:
-            return self._check_exception(e)
+            raise self._check_exception(e) from e
 
     def get_articles(self, limit=None, order=None):
         if self._storage.is_empty():
@@ -61,7 +67,7 @@ class PocketApp:
         try:
             self._pocket.archive(int(item_id)).commit()
         except PocketException as e:
-            return self._check_exception(e)
+            raise self._check_exception(e) from e
 
     def find_article(self, item_id):
         index = self._storage.read()
@@ -98,8 +104,7 @@ class PocketApp:
                 )
             except PocketException as e:
                 spinner.finish()
-                self._check_exception(e)
-                return
+                raise self._check_exception(e) from e
 
             if not articles['list']:
                 break
@@ -147,9 +152,7 @@ class PocketApp:
         return int(time.mktime(date.timetuple()))
 
     def _check_exception(self, e):
-        if int(e.error_code) == 136:
-            print('Application is not configured')
-            print('Run `pocket-cli configure` to be able to use this app')
-            return
-        print(e.message)
-        return False
+        if isinstance(e, PocketAutException):
+            raise AppNotConfigured('Application is not configured')
+
+        raise AppException(e.message)
