@@ -32,4 +32,4 @@ class Configs:
         self._config_parser.write(open(self._get_file_path(), 'w'))
 
     def _get_file_path(self):
-        return '{}/.pocket-time'.format(os.path.expanduser('~'))
+        return '{}/.pocket-config'.format(os.path.expanduser('~'))

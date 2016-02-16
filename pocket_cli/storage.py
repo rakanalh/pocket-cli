@@ -4,7 +4,7 @@ import os
 
 class Storage:
     def __init__(self):
-        self._filename = '{}/.pocket-time-index'.format(
+        self._filename = '{}/.pocket-index'.format(
             os.path.expanduser('~'))
 
     def is_empty(self):
