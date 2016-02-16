@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pocket-cli',
-    version='0.1',
+    version='0.1.1',
     author='Rakan Alhneiti',
     author_email='rakan.alhneiti@gmail.com',
     url='https://github.com/rakanalh/pocket-api',
@@ -17,6 +17,7 @@ setup(
     install_requires=[
         'click==6.2',
         'requests==2.9.1',
+        'progress==1.2',
         'pocket-api'
     ],
     entry_points={
