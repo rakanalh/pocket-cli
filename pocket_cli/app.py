@@ -72,6 +72,16 @@ class PocketApp:
                           key=itemgetter(sort_field))
         return articles
 
+    def search(self, search, state, tag, sort):
+        try:
+            articles = self._pocket.retrieve(search=search,
+                                             state=state,
+                                             tag=tag,
+                                             sort=sort)
+            return self._get_articles_index(articles)
+        except PocketException as e:
+            raise self._check_exception(e) from e
+
     def archive_article(self, item_id):
         try:
             self._pocket.archive(int(item_id)).commit()
@@ -94,11 +104,6 @@ class PocketApp:
 
         articles_index = []
 
-        wpm = self._configs.get('words_per_minute')
-        if not wpm:
-            wpm = self.DEFAULT_WORDS_PER_MINUTE
-        wpm = int(wpm)
-
         last_fetch = self._configs.get('last_fetch')
 
         offset = 0
@@ -118,30 +123,7 @@ class PocketApp:
             if not articles['list']:
                 break
 
-            for article in articles['list'].values():
-                word_count = int(article['word_count'])
-                if word_count == 0:
-                    reading_time = -1
-                else:
-                    reading_time = math.ceil(word_count / wpm)
-
-                title = article['resolved_title']
-                if not title:
-                    title = article['given_title']
-
-                url = article['resolved_url']
-                if not url:
-                    url = article['given_url']
-
-                index = {
-                    'id': article['item_id'],
-                    'title': title,
-                    'url': url,
-                    'word_count': article['word_count'],
-                    'reading_time': reading_time
-                }
-
-                articles_index.append(index)
+            articles_index.extend(self._get_articles_index(articles))
 
             offset += count
             if spinner:
@@ -160,6 +142,45 @@ class PocketApp:
 
         self._configs.set('last_fetch', self._get_timestamp(datetime.now()))
         self._configs.write()
+
+    def _get_articles_index(self, articles):
+        wpm = self._configs.get('words_per_minute')
+        if not wpm:
+            wpm = self.DEFAULT_WORDS_PER_MINUTE
+        wpm = int(wpm)
+
+        articles_index = []
+
+        articles_list = articles['list']
+        if isinstance(articles_list, list) and len(articles_list) == 0:
+            return articles_index
+
+        for article in articles_list.values():
+            word_count = int(article['word_count'])
+            if word_count == 0:
+                reading_time = -1
+            else:
+                reading_time = math.ceil(word_count / wpm)
+
+            title = article['resolved_title']
+            if not title:
+                title = article['given_title']
+
+            url = article['resolved_url']
+            if not url:
+                url = article['given_url']
+
+            index = {
+                'id': article['item_id'],
+                'title': title,
+                'url': url,
+                'word_count': article['word_count'],
+                'reading_time': reading_time
+            }
+
+            articles_index.append(index)
+
+        return articles_index
 
     def _get_timestamp(self, date):
         return int(time.mktime(date.timetuple()))

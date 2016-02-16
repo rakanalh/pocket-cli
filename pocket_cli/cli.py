@@ -92,20 +92,27 @@ def list_articles(limit, order):
               'run pocket-cli fetch to index your articles')
         return
 
-    try:
-        pager = subprocess.Popen(['less'],
-                                 stdin=subprocess.PIPE,
-                                 stdout=sys.stdout)
-        for article in articles:
-            if int(article['reading_time']) <= 0:
-                article['reading_time'] = 'Unknown'
-            pager.stdin.write(
-                bytearray(format_article(article, line=True), 'utf-8'))
+    output_articles(articles)
 
-        pager.stdin.close()
-        pager.wait()
-    except (KeyboardInterrupt, ValueError):
-        pass
+
+@click.command()
+@click.argument('search')
+@click.option('--state', '-s',
+              type=click.Choice(['unread', 'archive', 'all']),
+              default='unread')
+@click.option('--tag', '-t')
+@click.option('--sort', '-o',
+              type=click.Choice(['newest', 'oldest', 'title', 'site']),
+              default='newest')
+def search(search, state, tag, sort):
+    try:
+        articles = pocket_app.search(search, state, tag, sort)
+    except AppNotConfigured:
+        app_not_configured()
+    except AppException as e:
+        exception_occured(e)
+
+    output_articles(articles)
 
 
 @click.command()
@@ -176,6 +183,27 @@ def archive_article(article_id):
         exception_occured(e)
 
 
+def output_articles(articles):
+    if len(articles) == 0:
+        print('No articles found')
+        return
+
+    try:
+        pager = subprocess.Popen(['less'],
+                                 stdin=subprocess.PIPE,
+                                 stdout=sys.stdout)
+        for article in articles:
+            if int(article['reading_time']) <= 0:
+                article['reading_time'] = 'Unknown'
+            pager.stdin.write(
+                bytearray(format_article(article, line=True), 'utf-8'))
+
+        pager.stdin.close()
+        pager.wait()
+    except (KeyboardInterrupt, ValueError):
+        pass
+
+
 def app_not_configured():
     print('App is not configured')
     print('Run `pocket-cli configure` to be able to use the app')
@@ -191,6 +219,7 @@ def exception_occured(exception):
 main.add_command(configure)
 main.add_command(add_article)
 main.add_command(list_articles)
+main.add_command(search)
 main.add_command(random_article)
 main.add_command(fetch)
 main.add_command(read)
