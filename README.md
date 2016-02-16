@@ -15,6 +15,8 @@ Features
 * Multiple `fetch` command calls will retrieve articles since last fetch.
 
 
+Note: This is a Python 3 application tested on 3.5.0. Work in progress to make it 2.7 compatible.
+
 Installation
 ------------
 
