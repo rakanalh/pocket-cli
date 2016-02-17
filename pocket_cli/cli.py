@@ -6,6 +6,7 @@ from builtins import input
 import random
 import subprocess
 import sys
+import six
 import webbrowser
 
 import click
@@ -200,8 +201,12 @@ def output_articles(articles):
         for article in articles:
             if int(article['reading_time']) <= 0:
                 article['reading_time'] = 'Unknown'
-            pager.stdin.write(
-                bytearray(format_article(article, line=True), 'utf-8'))
+            content = format_article(article, line=True)
+
+            if six.PY3:
+                content = bytearray(content, 'utf-8')
+
+            pager.stdin.write(content)
 
         pager.stdin.close()
         pager.wait()
