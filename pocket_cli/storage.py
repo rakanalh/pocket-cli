@@ -27,7 +27,11 @@ class Storage:
         if self.is_empty():
             write_header = True
 
-        with open(self._filename, 'a+b') as csv_file:
+        mode = 'a+b'
+        if six.PY3:
+            mode = 'a+t'
+
+        with open(self._filename, mode) as csv_file:
             dict_writer = csv.DictWriter(csv_file, data[0].keys())
             if write_header:
                 dict_writer.writeheader()
@@ -40,8 +44,12 @@ class Storage:
         if not os.path.exists(self._filename):
             return index
 
+        mode = 'rb'
+        if six.PY3:
+            mode = 'r'
+
         row_counter = 0
-        with open(self._filename, 'rb') as csv_file:
+        with open(self._filename, mode) as csv_file:
             reader = csv.DictReader(csv_file)
             for row in reader:
                 index.append(row)
@@ -62,6 +70,9 @@ class Storage:
             os.remove(self._filename)
 
     def _encode_data(self, data):
+        if six.PY3:
+            return data
+
         for index, item in enumerate(data):
             for key, value in item.items():
                 if isinstance(value, six.string_types):
