@@ -1,3 +1,5 @@
+from future.utils import raise_from
+
 import math
 import time
 from datetime import datetime
@@ -57,7 +59,7 @@ class PocketApp:
         try:
             return self._pocket.add(url, title, tags)
         except PocketException as e:
-            raise self._check_exception(e) from e
+            raise_from(self._check_exception(e), e)
 
     def get_articles(self, limit=None, order=None):
         if self._storage.is_empty():
@@ -80,13 +82,13 @@ class PocketApp:
                                              sort=sort)
             return self._get_articles_index(articles)
         except PocketException as e:
-            raise self._check_exception(e) from e
+            raise_from(self._check_exception(e), e)
 
     def archive_article(self, item_id):
         try:
             self._pocket.archive(int(item_id)).commit()
         except PocketException as e:
-            raise self._check_exception(e) from e
+            raise_from(self._check_exception(e), e)
 
     def find_article(self, item_id):
         index = self._storage.read()
@@ -118,7 +120,7 @@ class PocketApp:
                 )
             except PocketException as e:
                 spinner.finish()
-                raise self._check_exception(e) from e
+                raise_from(self._check_exception(e), e)
 
             if not articles['list']:
                 break
