@@ -1,3 +1,4 @@
+from __future__ import division
 from future.utils import raise_from
 
 import math
@@ -162,7 +163,7 @@ class PocketApp:
             if word_count == 0:
                 reading_time = -1
             else:
-                reading_time = math.ceil(word_count / wpm)
+                reading_time = int(math.ceil(word_count / wpm))
 
             title = article['resolved_title']
             if not title:
