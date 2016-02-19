@@ -21,7 +21,10 @@ pocket_app = PocketApp()
 WORDS_PER_MINUTE = 180
 
 
-@click.group()
+CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+
+
+@click.group(context_settings=CONTEXT_SETTINGS)
 def main():
     pass
 
