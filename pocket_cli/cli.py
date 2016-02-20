@@ -38,14 +38,14 @@ def main():
               default='reading_time',
               prompt='Please provide your preferred sort field\n'
                      '\tAvailable options are [id, reading_time]\n'
-                     '\tdefault: [reading_time]')
+                     '\tdefault:')
 @click.option('--words-per-minute', '-wpm',
               type=click.INT,
               default=180,
               prompt='Please specify your reading speed in words per minute\n'
                      '\tYou can use this URL to estimate your reading time\n'
                      '\thttp://www.readingsoft.com/\n'
-                     '\tdefault: 180 wpm',
+                     '\tdefault:',
               help='Used in calculating reading time for each article')
 def configure(consumer_key, sort_field, words_per_minute):
     request_token = pocket_app.get_request_token(consumer_key)

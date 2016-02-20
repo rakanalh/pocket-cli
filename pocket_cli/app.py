@@ -177,7 +177,7 @@ class PocketApp:
                 'id': article['item_id'],
                 'title': title,
                 'url': url,
-                'word_count': article['word_count'],
+                'word_count': word_count,
                 'reading_time': reading_time
             }
 
