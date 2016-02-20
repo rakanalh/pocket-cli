@@ -25,6 +25,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 
 @click.group(context_settings=CONTEXT_SETTINGS)
+@click.version_option()
 def main():
     pass
 
@@ -34,10 +35,17 @@ def main():
               prompt='Please provide your consumer key')
 @click.option('--sort_field', '-s',
               type=click.Choice(['id', 'reading_time']),
-              prompt='Please provide your preferred sort field')
+              default='reading_time',
+              prompt='Please provide your preferred sort field\n'
+                     '\tAvailable options are [id, reading_time]\n'
+                     '\tdefault: [reading_time]')
 @click.option('--words-per-minute', '-wpm',
               type=click.INT,
-              prompt='Please prefer your reading speed in words per minute',
+              default=180,
+              prompt='Please specify your reading speed in words per minute\n'
+                     '\tYou can use this URL to estimate your reading time\n'
+                     '\thttp://www.readingsoft.com/\n'
+                     '\tdefault: 180 wpm',
               help='Used in calculating reading time for each article')
 def configure(consumer_key, sort_field, words_per_minute):
     request_token = pocket_app.get_request_token(consumer_key)
