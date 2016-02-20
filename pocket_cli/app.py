@@ -159,17 +159,17 @@ class PocketApp:
             return articles_index
 
         for article in articles_list.values():
-            word_count = int(article['word_count'])
+            word_count = int(article.get('word_count', 0))
             if word_count == 0:
                 reading_time = -1
             else:
                 reading_time = int(math.ceil(word_count / wpm))
 
-            title = article['resolved_title']
+            title = article.get('resolved_title', None)
             if not title:
                 title = article['given_title']
 
-            url = article['resolved_url']
+            url = article.get('resolved_url', None)
             if not url:
                 url = article['given_url']
 
