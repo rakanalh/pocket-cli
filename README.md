@@ -3,6 +3,8 @@ Pocket CLI
 
 Pocket-CLI is an application for reading / listing and managing your GetPocket.com articles from the terminal.
 
+Note: This app is based on my [Pocket-API](https://github.com/rakanalh/pocket-api) package.
+
 Features
 --------
 
