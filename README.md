@@ -24,6 +24,20 @@ Installation
 
     pip install pocket-cli
 
+Configuration
+-------------
+
+ If you already have a Pocket API consumer key, skip to step 2.
+
+ 1. Generate a Pocket API consumer key at https://getpocket.com/developer/apps/new. Here's an example:
+
+ ![](/docs/create_consumer_key.png?raw=true)
+
+ 2. Run `pocket-cli configure` and enter the consumer key generated in step 1 when prompted.
+ 3. Next, you will be prompted for a sort order and your estimated reading speed. You may visit http://www.readingsoft.com/ to estimate your reading speed.
+ 4. After you have finished selecting configurations for `pocket-cli`, a browser window will open requesting access to your Pocket account. Log in to Pocket (if you are not already logged in) and click **Authorize** to accept and complete the configuration of `pocket-cli`.
+
+
 Usage
 -----
 
