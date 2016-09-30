@@ -48,7 +48,9 @@ def main():
                      '\tdefault:',
               help='Used in calculating reading time for each article')
 def configure(consumer_key, sort_field, words_per_minute):
-    request_token = pocket_app.get_request_token(consumer_key)
+    pocket_app.init_consumer_key(consumer_key)
+
+    request_token = pocket_app.get_request_token()
 
     if not request_token:
         print('Could not obtain request_token')
@@ -62,7 +64,7 @@ def configure(consumer_key, sort_field, words_per_minute):
     webbrowser.open_new_tab(url)
     input()
 
-    access_token = pocket_app.get_access_token(consumer_key, request_token)
+    access_token = pocket_app.get_access_token(request_token)
 
     if not access_token:
         print('Could not obtain access token')

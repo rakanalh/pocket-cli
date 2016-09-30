@@ -43,14 +43,22 @@ class PocketApp:
 
         self._storage.clear()
 
-    def get_request_token(self, consumer_key):
-        return self._pocket.get_request_token(
-            consumer_key, self.REDIRECT_URL
+        self._pocket = Pocket(
+            consumer_key,
+            access_token
         )
 
-    def get_access_token(self, consumer_key, request_token):
+    def init_consumer_key(self, consumer_key):
+        self._pocket = Pocket(consumer_key)
+
+    def get_request_token(self):
+        return self._pocket.get_request_token(
+            self.REDIRECT_URL
+        )
+
+    def get_access_token(self, request_token):
         return self._pocket.get_access_token(
-            consumer_key, request_token
+            request_token
         )
 
     def add_article(self, url, title=None, tags=None):
