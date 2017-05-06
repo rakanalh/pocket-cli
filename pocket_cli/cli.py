@@ -61,6 +61,8 @@ def configure(consumer_key, sort_field, words_per_minute):
 
     print('You will have to authorize the application to access your articles')
     print('Enter any key once you\'re redirected to google.com')
+    print('Or open this link in browser manually:')
+    print(url);
     webbrowser.open_new_tab(url)
     input()
 
